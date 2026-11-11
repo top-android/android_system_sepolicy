@@ -84,6 +84,8 @@ neverallow { coredomain -bpfloader -netd -netutils_wrapper } fs_bpf_vendor:file 
 neverallow bpfloader *:{ tcp_socket udp_socket rawip_socket } *;
 
 # No domain should be allowed to ptrace bpfloader
-neverallow { domain userdebug_or_eng(`-llkd') } bpfloader:process ptrace;
+# [cannon][A17] userdebug/eng 上额外放行 crash_dump：bpfloader 是最早启动的进程之一，
+# 不给 ptrace 就永远拿不到它的 tombstone（tombstone_00~09 全是 0 字节）。
+neverallow { domain userdebug_or_eng(`-llkd -crash_dump') } bpfloader:process ptrace;
 
 neverallow { domain -bpfloader } proc_bpf:file write;
