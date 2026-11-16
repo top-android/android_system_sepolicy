@@ -216,3 +216,8 @@ allow system_app vendor_boot_ota_file:file { r_file_perms };
 # allow system_app to read system_dlkm_file for /system_dlkm/etc/NOTICE.xml.gz
 allow system_app system_dlkm_file:dir search;
 allow system_app system_dlkm_file:file { getattr open read };
+
+# cannon: SystemUI's network traffic monitor reads per-interface counters from
+# /proc/net/dev. TrafficStats is eBPF backed on Android 17 and netd.bpf does not
+# load on this device's 4.14 kernel, so the kernel counters are the only source.
+allow system_app proc_net:file r_file_perms;
