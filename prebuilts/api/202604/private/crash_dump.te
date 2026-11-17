@@ -20,6 +20,9 @@ allow crash_dump {
 
 userdebug_or_eng(`
   allow crash_dump { apexd llkd logd vold }:process { ptrace signal sigchld sigstop sigkill };
+  # [cannon][A17] bpfloader 在 4.14 上会 SIGABRT，但它是最早启动的进程之一，
+  # 没有这条 crash_dump 连 ptrace 都做不了，tombstone 永远是 0 字节。
+  allow crash_dump bpfloader:process { ptrace signal sigchld sigstop sigkill };
 ')
 
 # Read ART APEX data directory
@@ -129,6 +132,7 @@ neverallow crash_dump {
   apexd
   userdebug_or_eng(`-apexd')
   bpfloader
+  userdebug_or_eng(`-bpfloader')
   init
   kernel
   keystore
